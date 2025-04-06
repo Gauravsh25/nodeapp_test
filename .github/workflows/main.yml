@@ -1,9 +1,9 @@
-name: Build and Deploy to Kubernetes
+name: Build and Deploy to EKS
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -32,14 +32,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1  # Replace with your region
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
-      - name: Deploy to Kubernetes
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --region ap-south-1 --name my-cluster  # Replace with your cluster name
+
+      - name: Deploy to EKS
         run: |
           kubectl set image deployment/my-deployment my-container=mydockerhub/myapp:${{ github.sha }}
           kubectl rollout status deployment/my-deployment
