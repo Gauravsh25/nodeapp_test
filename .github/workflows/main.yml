@@ -25,7 +25,7 @@ jobs:
           docker tag myapp:${{ github.sha }} gauravsharma25861/myapp:${{ github.sha }}
 
       - name: Push Docker Image
-        run: docker push mydockerhub/myapp:${{ github.sha }}
+        run: docker push gauravsharma25861/myapp:${{ github.sha }}
 
   deploy:
     needs: build
